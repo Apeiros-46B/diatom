@@ -17,7 +17,7 @@ PanelWindow {
 
 		Process {
 			id: dateProc
-			command: ["date"]
+			command: ["date", "+%Y.%m.%d:%u"]
 			running: true
 			stdout: StdioCollector {
 				onStreamFinished: clock.text = this.text
