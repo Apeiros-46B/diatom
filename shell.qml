@@ -1,34 +1,24 @@
 import Quickshell
-import Quickshell.Io
 import QtQuick
+import Niri
 
-PanelWindow {
-	anchors {
-		top: true
-		left: true
-		right: true
+import Bars
+
+ShellRoot {
+	Niri {
+		id: niriInstance
+		Component.onCompleted: {
+			connect()
+			niriInstance.workspaces.maxCount = 10
+		}
+
+		onConnected: console.log("Connected to niri")
+		onErrorOccurred: function(err) {
+			console.error("Niri error:", err)
+		}
 	}
 
-	implicitHeight: 20
-
-	Text {
-		id: clock
-		anchors.centerIn: parent
-
-		Process {
-			id: dateProc
-			command: ["date", "+%Y.%m.%d:%u"]
-			running: true
-			stdout: StdioCollector {
-				onStreamFinished: clock.text = this.text
-			}
-		}
-
-		Timer {
-			interval: 1000
-			running: true
-			repeat: true
-			onTriggered: dateProc.running = true
-		}
+	LeftBar {
+		niri: niriInstance
 	}
 }
