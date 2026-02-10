@@ -8,7 +8,7 @@ import "./widgets"
 PanelWindow {
 	id: root
 	anchors {
-		left: true
+		right: true
 		top: true
 		bottom: true
 	}
@@ -17,16 +17,8 @@ PanelWindow {
 
 	required property Niri niri
 
-	Workspaces {
-		anchors.top: parent.top
-		niri: root.niri
-	}
-
-	Volume {
-		anchors.verticalCenter: parent.verticalCenter
-	}
-
-	Clock {
-		anchors.bottom: parent.bottom
-	}
+	// Workspaces {
+	// 	anchors.top: parent.top
+	// 	niri: root.niri
+	// }
 }

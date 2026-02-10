@@ -1,5 +1,6 @@
 pragma Singleton
 import QtQuick
+
 import NixTheme
 
 QtObject {
@@ -17,6 +18,21 @@ QtObject {
 		readonly property color focused: Theme.blue
 		readonly property color unfocused: Theme.fg3
 		readonly property color empty: Theme.bg2
+	}
+
+	readonly property var volume: QtObject {
+		readonly property int height: 200
+		readonly property color fill: Theme.green
+		readonly property color fillMuted: Theme.fg3
+		readonly property color trough: Theme.bg2
+	}
+
+	readonly property var clock: QtObject {
+		readonly property int spacing: 2
+		readonly property int spacingBig: 10
+		readonly property int barHeight: 24
+		readonly property color fill: Theme.fg3
+		readonly property color trough: Theme.bg2
 	}
 }
 

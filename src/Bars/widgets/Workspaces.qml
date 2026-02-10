@@ -5,12 +5,9 @@ import Shared
 
 Column {
 	id: root
-	required property Niri niri
-
-	anchors {
-		top: parent.top
-	}
 	spacing: Style.workspace.spacing
+
+	required property Niri niri
 
 	Repeater {
 		model: root.niri.workspaces

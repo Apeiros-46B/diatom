@@ -1,5 +1,5 @@
-import Quickshell
 import QtQuick
+import Quickshell
 import Niri
 
 import Bars
@@ -19,6 +19,10 @@ ShellRoot {
 	}
 
 	LeftBar {
+		niri: niriInstance
+	}
+
+	RightBar {
 		niri: niriInstance
 	}
 }
