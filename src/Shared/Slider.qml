@@ -4,10 +4,14 @@ Item {
 	id: root
 
 	property real value: 0.0 // 0-1
+	property real stepSize: 0.05 // 0-1
+	property bool round: true // whether to round scrolling to increments
 	property bool vertical: false
 	property bool animate: true
 	property color fillColor: Style.genericSlider.fill
 	property color trackColor: Style.genericSlider.track
+
+	final property real stepCount: 1.0 / stepSize
 
 	signal moved(real value)
 
@@ -56,8 +60,11 @@ Item {
 			if (pressedButtons & Qt.LeftButton) emitValue(ev);
 		}
 		onWheel: (ev) => {
-			const delta = (ev.angleDelta.y > 0) ? 0.05 : -0.05;
-			const p = Math.round((root.value + delta) * 20) / 20;
+			const delta = (ev.angleDelta.y > 0) ? root.stepSize : -root.stepSize;
+			var p = root.value + delta
+			if (root.round) {
+				p = Math.round(p * root.stepCount) / root.stepCount;
+			}
 			root.moved(Math.max(0.0, Math.min(1.0, p)));
 		}
 	}

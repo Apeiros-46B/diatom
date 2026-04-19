@@ -9,7 +9,6 @@ import Quickshell.Services.Mpris
 import Shared
 
 PopupWindow {
-	visible: true
 	id: root
 	anchor {
 		window: bar
@@ -23,7 +22,8 @@ PopupWindow {
 	required property PanelWindow bar
 
 	property string preferredPlayer: 'io.github.quodlibet.QuodLibet'
-	property MprisPlayer player: {
+
+	final property MprisPlayer player: {
 		for (const candidate of Mpris.players.values) {
 			if (candidate.desktopEntry === preferredPlayer) {
 				return candidate;
@@ -32,9 +32,9 @@ PopupWindow {
 		return null;
 	}
 
-	property bool settingsOpen: true
-	property bool needsLyricsLoad: true
-	property int activeLyricIndex: -1
+	final property bool settingsOpen: true
+	final property bool needsLyricsLoad: true
+	final property int activeLyricIndex: -1
 
 	ListModel { id: lyricModel }
 
@@ -133,7 +133,7 @@ PopupWindow {
 		width: Style.musicPopup.buttonSize
 		height: Style.musicPopup.buttonSize
 
-		property url iconSource
+		required property url iconSource
 		property color color: Style.fgSubtle
 
 		signal clicked()
@@ -299,8 +299,14 @@ PopupWindow {
 
 						Slider {
 							anchors.fill: parent
+
 							vertical: false
 							animate: false // we use FrameAnimation
+							round: false // we want skipping from current pos, not quantization
+							stepSize: root.player.lengthSupported
+								? (5.0 / root.player.length) // 5 second step if possible
+								: 0.02 // 2%
+
 							value: root.player && root.player.length > 0
 								? (root.player.position / root.player.length)
 								: 0
