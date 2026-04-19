@@ -14,7 +14,7 @@ ShellRoot {
 
 		onConnected: console.log("Connected to niri")
 		onErrorOccurred: function(err) {
-			console.error("Niri error:", err)
+			console.error("Niri error:", err);
 		}
 	}
 

@@ -5,10 +5,14 @@ import NixTheme
 
 QtObject {
 	readonly property color bg: Theme.bg0
+	readonly property color fg: Theme.fg0
+	readonly property color fgSubtle: Theme.fg3
+	readonly property color popupBg: Theme.bg1
 	readonly property color accent: Theme.blue
 
 	readonly property var bar: QtObject {
 		readonly property int width: 8
+		readonly property int popupGap: 16
 	}
 
 	readonly property var workspace: QtObject {
@@ -21,6 +25,13 @@ QtObject {
 	}
 
 	readonly property var volume: QtObject {
+		readonly property int height: 200
+		readonly property color fill: Theme.green
+		readonly property color fillMuted: Theme.fg3
+		readonly property color trough: Theme.bg2
+	}
+
+	readonly property var musicPopup: QtObject {
 		readonly property int height: 200
 		readonly property color fill: Theme.green
 		readonly property color fillMuted: Theme.fg3

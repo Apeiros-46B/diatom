@@ -4,6 +4,7 @@ import Niri
 
 import Shared
 import "./widgets"
+import "./popups"
 
 PanelWindow {
 	id: root
@@ -12,8 +13,8 @@ PanelWindow {
 		top: true
 		bottom: true
 	}
-	implicitWidth: Style.bar.width;
-	color: Style.bg;
+	implicitWidth: Style.bar.width
+	color: Style.bg
 
 	required property Niri niri
 
@@ -24,6 +25,10 @@ PanelWindow {
 
 	Volume {
 		anchors.verticalCenter: parent.verticalCenter
+	}
+
+	Music {
+		bar: root
 	}
 
 	Clock {
