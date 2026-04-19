@@ -48,9 +48,6 @@ QtObject {
 		readonly property int buttonSize: root.lengths.medium
 		readonly property int barThickness: root.lengths.mini
 		readonly property int albumArtSize: root.lengths.huge
-		readonly property color fill: Theme.green
-		readonly property color fillMuted: Theme.fg3
-		readonly property color trough: Theme.bg2
 	}
 
 	readonly property var clock: QtObject {

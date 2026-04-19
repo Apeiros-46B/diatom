@@ -21,7 +21,7 @@ PopupWindow {
 
 	required property PanelWindow bar
 
-	final property bool settingsOpen: true
+	final property bool settingsOpen: false
 
 	// {{{ music page
 	component MusicPage: Item {
@@ -167,6 +167,27 @@ PopupWindow {
 		}
 		// }}}
 
+		// {{{ background art
+		Image {
+			id: bgArt
+			source: musicRoot.player ? musicRoot.player.trackArtUrl : ''
+			anchors.fill: parent
+			fillMode: Image.PreserveAspectCrop
+			visible: false
+		}
+
+		MultiEffect {
+			source: bgArt
+			anchors.fill: bgArt
+			visible: musicRoot.player !== null
+			blurEnabled: true
+			blur: 1.0
+			blurMax: 48
+			saturation: -1.0
+			opacity: 0.1
+		}
+		// }}}
+
 		// {{{ ui
 		// fallback for no players
 		Text {
@@ -224,19 +245,19 @@ PopupWindow {
 					spacing: Style.lengths.mini
 
 					ImageButton {
-						iconSource: './icons/previous.svg'
+						iconSource: Qt.resolvedUrl('./icons/previous.svg')
 						onClicked: musicRoot.player.previous()
 					}
 
 					ImageButton {
 						iconSource: musicRoot.player.playbackState === MprisPlaybackState.Playing
-							? './icons/pause.svg'
-							: './icons/play.svg'
+							? Qt.resolvedUrl('./icons/pause.svg')
+							: Qt.resolvedUrl('./icons/play.svg')
 						onClicked: musicRoot.player.togglePlaying()
 					}
 
 					ImageButton {
-						iconSource: './icons/next.svg'
+						iconSource: Qt.resolvedUrl('./icons/next.svg')
 						onClicked: musicRoot.player.next()
 					}
 				}
@@ -257,6 +278,8 @@ PopupWindow {
 						stepSize: musicRoot.player.lengthSupported
 							? (5.0 / musicRoot.player.length) // 5 second step if possible
 							: 0.02 // 2%
+
+						trackColor: Style.bgRaised
 
 						value: musicRoot.player && musicRoot.player.length > 0
 							? (musicRoot.player.position / musicRoot.player.length)
@@ -308,27 +331,25 @@ PopupWindow {
 				}
 
 				Rectangle {
-					visible: parent.count != 0
-					anchors.top: parent.top
-					anchors.left: parent.left
-					anchors.right: parent.right
-					height: Style.lengths.medium
+					id: lyricListMask
+					anchors.fill: parent
+					visible: false
+					layer.enabled: true
 					gradient: Gradient {
-						GradientStop { position: 0.0; color: Style.bgPopup }
+						orientation: Gradient.Vertical
+						GradientStop { position: 0.0; color: 'transparent' }
+						GradientStop { position: 0.5; color: 'white' }
+						GradientStop { position: 0.65; color: 'white' }
 						GradientStop { position: 1.0; color: 'transparent' }
 					}
 				}
 
-				Rectangle {
-					visible: parent.count != 0
-					anchors.bottom: parent.bottom
-					anchors.left: parent.left
-					anchors.right: parent.right
-					height: Style.lengths.medium
-					gradient: Gradient {
-						GradientStop { position: 0.0; color: 'transparent' }
-						GradientStop { position: 1.0; color: Style.bgPopup }
-					}
+				layer.enabled: true
+				layer.effect: MultiEffect {
+					maskEnabled: true
+					maskSource: lyricListMask
+					maskSpreadAtMin: 1.0
+					maskThresholdMin: 0.4
 				}
 			}
 		}
@@ -344,7 +365,9 @@ PopupWindow {
 			margins: Style.lengths.small
 		}
 		z: 10
-		iconSource: root.settingsOpen ? './icons/disc.svg' : './icons/mix.svg'
+		iconSource: root.settingsOpen
+			? Qt.resolvedUrl('./icons/disc.svg')
+			: Qt.resolvedUrl('./icons/mix.svg')
 		onClicked: root.settingsOpen = !root.settingsOpen
 	}
 

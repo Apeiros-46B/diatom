@@ -51,7 +51,10 @@ Item {
 			const p = root.vertical
 				? 1.0 - (mousePos.y / root.height)
 				: mousePos.x / root.width;
-			const mapped = Math.max(0.0, Math.min(1.0, p));
+			let mapped = Math.max(0.0, Math.min(1.0, p));
+			if (root.round) {
+				mapped = Math.round(mapped * root.stepCount) / root.stepCount;
+			}
 			root.moved(mapped);
 		}
 
@@ -61,11 +64,11 @@ Item {
 		}
 		onWheel: (ev) => {
 			const delta = (ev.angleDelta.y > 0) ? root.stepSize : -root.stepSize;
-			var p = root.value + delta
+			var mapped = Math.max(0.0, Math.min(1.0, root.value + delta))
 			if (root.round) {
-				p = Math.round(p * root.stepCount) / root.stepCount;
+				mapped = Math.round(mapped * root.stepCount) / root.stepCount;
 			}
-			root.moved(Math.max(0.0, Math.min(1.0, p)));
+			root.moved(mapped);
 		}
 	}
 }
