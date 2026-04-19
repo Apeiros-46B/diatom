@@ -37,6 +37,8 @@ PopupWindow {
 			return null;
 		}
 
+		// for slider, updated by FrameAnimation
+		final property real visualPosition: 0.0
 		final property bool needsLyricsLoad: true
 		final property int activeLyricIndex: -1
 
@@ -106,8 +108,70 @@ PopupWindow {
 				lyricModel.append(line);
 			}
 		}
+		// }}}
+
+		// {{{ update lyrics and progress
+		FrameAnimation {
+			running: root.visible && musicRoot.player && musicRoot.player.playbackState === MprisPlaybackState.Playing
+			onTriggered: {
+				if (musicRoot.player) {
+					musicRoot.visualPosition = musicRoot.player.position;
+				}
+			}
+		}
+
+		Connections {
+			target: root
+
+			function onVisibleChanged() {
+				if (root.visible) {
+					// re-sync lyrics because the timers were not active when the popup was closed
+					musicRoot.updateCurrentLyric();
+				}
+			}
+		}
+
+		Connections {
+			target: musicRoot.player
+
+			function onMetadataChanged() {
+				musicRoot.needsLyricsLoad = true;
+				musicRoot.updateCurrentLyric();
+			}
+
+			function onPlaybackStateChanged() {
+				if (musicRoot.player && musicRoot.player.playbackState === MprisPlaybackState.Playing) {
+					musicRoot.updateCurrentLyric();
+				} else {
+					lyricTimer.stop();
+				}
+			}
+
+			function onPositionChanged() {
+				musicRoot.updateCurrentLyric();
+			}
+		}
+
+		Timer {
+			id: lyricTimer
+			repeat: false
+			onTriggered: {
+				// advance the index and schedule the next line immediately
+				if (musicRoot.activeLyricIndex + 1 < lyricModel.count) {
+					musicRoot.activeLyricIndex++;
+					musicRoot.scheduleNextLyric();
+				}
+			}
+		}
 
 		function updateCurrentLyric() {
+			if (musicRoot.needsLyricsLoad) {
+				musicRoot.needsLyricsLoad = false;
+				if (musicRoot.player && musicRoot.player.metadata) {
+					musicRoot.loadLyrics(musicRoot.player.metadata["xesam:url"]);
+				}
+			}
+
 			if (lyricModel.count === 0 || !player) return;
 
 			const pos = player.position;
@@ -131,38 +195,23 @@ PopupWindow {
 			}
 
 			activeLyricIndex = newIndex;
-		}
-		// }}}
-
-		// {{{ update lyrics and progress
-		Connections {
-			target: musicRoot.player
-
-			function onMetadataChanged() {
-				if (musicRoot.player && musicRoot.player.metadata) {
-					musicRoot.loadLyrics(musicRoot.player.metadata["xesam:url"]);
-				}
-			}
+			scheduleNextLyric();
 		}
 
-		// to smoothly update progress bar
-		FrameAnimation {
-			running: root.visible && musicRoot.player && musicRoot.player.playbackState === MprisPlaybackState.Playing
-			onTriggered: musicRoot.player.positionChanged();
-		}
+		function scheduleNextLyric() {
+			lyricTimer.stop();
+			if (!player || player.playbackState !== MprisPlaybackState.Playing) return;
+			if (lyricModel.count === 0 || activeLyricIndex + 1 >= lyricModel.count) return;
 
-		Timer {
-			interval: 100
-			running: root.visible && musicRoot.player
-			repeat: true
-			onTriggered: {
-				if (musicRoot.needsLyricsLoad) {
-					musicRoot.needsLyricsLoad = false;
-					if (musicRoot.player && musicRoot.player.metadata) {
-						musicRoot.loadLyrics(musicRoot.player.metadata["xesam:url"]);
-					}
-				}
-				musicRoot.updateCurrentLyric();
+			const nextTime = lyricModel.get(activeLyricIndex + 1).time;
+			const deltaMs = (nextTime - player.position) * 1000;
+
+			if (deltaMs > 0) {
+				lyricTimer.interval = deltaMs;
+				lyricTimer.start();
+			} else {
+				// fallback if the calculation yields a negative delta
+				updateCurrentLyric();
 			}
 		}
 		// }}}
@@ -298,7 +347,7 @@ PopupWindow {
 						trackColor: Style.musicPopup.progressTrack
 
 						value: musicRoot.player && musicRoot.player.length > 0
-							? (musicRoot.player.position / musicRoot.player.length)
+							? (musicRoot.visualPosition / musicRoot.player.length)
 							: 0
 
 						onMoved: value => {
