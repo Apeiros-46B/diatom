@@ -7,7 +7,7 @@ Rectangle {
 	id: root
 	width: Style.bar.width
 	height: Style.volume.height
-	color: Style.volume.trough
+	color: Style.volume.track
 
 	property real progressValue: 0.7
 	property var activeSink: Pipewire.defaultAudioSink

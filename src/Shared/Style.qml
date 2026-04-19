@@ -39,7 +39,7 @@ QtObject {
 		readonly property int height: root.bar.width * 25
 		readonly property color fill: Theme.green
 		readonly property color fillMuted: Theme.fg3
-		readonly property color trough: Theme.bg2
+		readonly property color track: Theme.bg2
 	}
 
 	readonly property var musicPopup: QtObject {
@@ -48,6 +48,11 @@ QtObject {
 		readonly property int buttonSize: root.lengths.medium
 		readonly property int barThickness: root.lengths.mini
 		readonly property int albumArtSize: root.lengths.huge
+		readonly property real bgArtOpacity: 0.3
+		readonly property color bgArtDark: root.bgPopup
+		readonly property color bgArtLight: root.fgSubtle
+		readonly property color progressFill: Theme.blue
+		readonly property color progressTrack: root.bgRaised
 	}
 
 	readonly property var clock: QtObject {
@@ -55,7 +60,7 @@ QtObject {
 		readonly property int spacingBig: root.lengths.tiny * 5
 		readonly property int barHeight: root.lengths.small * 3
 		readonly property color fill: Theme.fg3
-		readonly property color trough: Theme.bg2
+		readonly property color track: Theme.bg2
 	}
 
 	readonly property var genericSlider: QtObject {

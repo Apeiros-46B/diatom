@@ -177,14 +177,29 @@ PopupWindow {
 		}
 
 		MultiEffect {
+			id: bgArtProcessed
 			source: bgArt
 			anchors.fill: bgArt
-			visible: musicRoot.player !== null
+			visible: false
+			layer.enabled: true
+
 			blurEnabled: true
+			blurMax: 42
 			blur: 1.0
-			blurMax: 48
-			saturation: -1.0
-			opacity: 0.1
+			contrast: 1.5
+		}
+
+		ShaderEffect {
+			anchors.fill: bgArtProcessed
+			visible: musicRoot.player !== null
+
+			opacity: Style.musicPopup.bgArtOpacity
+
+			property variant source: bgArtProcessed
+			property color colorDark: Style.musicPopup.bgArtDark
+			property color colorLight: Style.musicPopup.bgArtLight
+
+			fragmentShader: "./shaders/image_ramp.frag.qsb"
 		}
 		// }}}
 
@@ -194,7 +209,7 @@ PopupWindow {
 			anchors.centerIn: parent
 			visible: musicRoot.player === null
 			text: 'No music playing'
-			color: Style.fgSubtle
+			color: Style.fg
 		}
 
 		ColumnLayout {
@@ -279,7 +294,8 @@ PopupWindow {
 							? (5.0 / musicRoot.player.length) // 5 second step if possible
 							: 0.02 // 2%
 
-						trackColor: Style.bgRaised
+						fillColor: Style.musicPopup.progressFill
+						trackColor: Style.musicPopup.progressTrack
 
 						value: musicRoot.player && musicRoot.player.length > 0
 							? (musicRoot.player.position / musicRoot.player.length)
@@ -299,6 +315,7 @@ PopupWindow {
 
 				Layout.fillWidth: true
 				Layout.fillHeight: true
+				Layout.bottomMargin: Style.lengths.small
 
 				model: lyricModel
 				snapMode: ListView.SnapToItem
@@ -306,8 +323,8 @@ PopupWindow {
 				interactive: false
 
 				highlightRangeMode: ListView.StrictlyEnforceRange
-				preferredHighlightBegin: height / 2
-				preferredHighlightEnd: height / 2
+				preferredHighlightBegin: height / 2 - (currentItem ? currentItem.height / 2 : 0)
+				preferredHighlightEnd: height / 2 + (currentItem ? currentItem.height / 2 : 0)
 				highlightMoveDuration: 150
 
 				delegate: Text {
@@ -337,10 +354,10 @@ PopupWindow {
 					layer.enabled: true
 					gradient: Gradient {
 						orientation: Gradient.Vertical
-						GradientStop { position: 0.0; color: 'transparent' }
-						GradientStop { position: 0.5; color: 'white' }
-						GradientStop { position: 0.65; color: 'white' }
-						GradientStop { position: 1.0; color: 'transparent' }
+						GradientStop { position: 0.05; color: 'transparent' }
+						GradientStop { position: 0.45; color: 'white' }
+						GradientStop { position: 0.55; color: 'white' }
+						GradientStop { position: 0.95; color: 'transparent' }
 					}
 				}
 

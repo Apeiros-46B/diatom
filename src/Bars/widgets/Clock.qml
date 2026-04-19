@@ -59,7 +59,7 @@ Item {
 		id: bar
 		width: Style.bar.width
 		height: Style.clock.barHeight
-		color: Style.clock.trough
+		color: Style.clock.track
 
 		required property int hour
 		required property int min
