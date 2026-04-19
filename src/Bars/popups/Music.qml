@@ -22,27 +22,17 @@ PopupWindow {
 
 	required property PanelWindow bar
 
-	property string preferred: 'io.github.quodlibet.QuodLibet'
-	property MprisPlayer player: selectPlayer()
-
-	function selectPlayer() {
+	property string preferredPlayer: 'io.github.quodlibet.QuodLibet'
+	property MprisPlayer player: {
 		for (const candidate of Mpris.players.values) {
-			if (candidate.desktopEntry === preferred) {
+			if (candidate.desktopEntry === preferredPlayer) {
 				return candidate;
 			}
 		}
 		return null;
 	}
 
-	property string trackFile: {
-		const url = player.metadata['xesam:url'];
-		if (url) {
-			const decoded = decodeURI(url);
-			return decoded.substring(decoded.lastIndexOf('/') + 1);
-		} else {
-			return 'not found';
-		}
-	}
+	property bool settingsOpen: true
 	property bool needsLyricsLoad: true
 	property int activeLyricIndex: -1
 
@@ -201,160 +191,191 @@ PopupWindow {
 		}
 	}
 
-	ColumnLayout {
+	PlayerButton {
+		anchors {
+			top: parent.top
+			right: parent.right
+			margins: Style.lengths.small
+		}
+		z: 10
+		iconSource: root.settingsOpen ? './icons/disc.svg' : './icons/mix.svg'
+		onClicked: root.settingsOpen = !root.settingsOpen
+	}
+
+	StackLayout {
 		anchors.fill: parent
-		anchors.margins: Style.lengths.small
+		currentIndex: root.settingsOpen ? 0 : 1
 
-		GridLayout {
-			Layout.fillWidth: true
-			columns: 2
-			rowSpacing: Style.lengths.small
-			columnSpacing: Style.lengths.small
+		// {{{ audio settings page
+		Item {
+			Text {
+				anchors.centerIn: parent
+				text: 'TODO: Audio settings'
+				color: Style.fgSubtle
+			}
+		}
+		// }}}
 
-			// row 1, column 1 - album cover
-			Image {
-				Layout.preferredWidth: Style.musicPopup.albumArtSize
-				Layout.preferredHeight: Style.musicPopup.albumArtSize
-				fillMode: Image.PreserveAspectFit
-				mipmap: true // smoother downscale
-				source: root.player.trackArtUrl
+		// {{{ music page
+		Item {
+			Text {
+				anchors.centerIn: parent
+				visible: root.player === null
+				text: 'No music playing'
+				color: Style.fgSubtle
 			}
 
-			// row 1, column 2 - info
-			Column {
-				Text {
-					color: Style.fg
-					text: root.player.trackTitle
-					font {
-						bold: true
-						pointSize: 11
+			ColumnLayout {
+				anchors.fill: parent
+				anchors.margins: Style.lengths.small
+				visible: root.player !== null
+
+				GridLayout {
+					Layout.fillWidth: true
+					columns: 2
+					rowSpacing: Style.lengths.small
+					columnSpacing: Style.lengths.small
+
+					// row 1, column 1 - album cover
+					Image {
+						Layout.preferredWidth: Style.musicPopup.albumArtSize
+						Layout.preferredHeight: Style.musicPopup.albumArtSize
+						fillMode: Image.PreserveAspectFit
+						mipmap: true // smoother downscale
+						source: root.player.trackArtUrl
+					}
+
+					// row 1, column 2 - info
+					Column {
+						Text {
+							color: Style.fg
+							text: root.player.trackTitle
+							font {
+								bold: true
+								pointSize: 11
+							}
+						}
+
+						Text {
+							color: Style.fg
+							text: root.player.trackAlbum
+						}
+
+						Text {
+							color: Style.fg
+							text: root.player.trackArtist
+						}
+					}
+
+					// row 2, column 1 - buttons
+					RowLayout {
+						Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+						spacing: Style.lengths.mini
+
+						PlayerButton {
+							iconSource: './icons/previous.svg'
+							onClicked: root.player.previous()
+						}
+
+						PlayerButton {
+							iconSource: root.player.playbackState === MprisPlaybackState.Playing
+								? './icons/pause.svg'
+								: './icons/play.svg'
+							onClicked: root.player.togglePlaying()
+						}
+
+						PlayerButton {
+							iconSource: './icons/next.svg'
+							onClicked: root.player.next()
+						}
+					}
+
+					// row 2, column 2 - progress bar
+					Item {
+						Layout.fillWidth: true
+						Layout.alignment: Qt.AlignVCenter
+						Layout.preferredHeight: Style.musicPopup.barThickness
+						Layout.rightMargin: Style.lengths.mini
+
+						Slider {
+							anchors.fill: parent
+							vertical: false
+							animate: false // we use FrameAnimation
+							value: root.player && root.player.length > 0
+								? (root.player.position / root.player.length)
+								: 0
+
+							onMoved: value => {
+								if (root.player && root.player.length > 0) {
+									root.player.position = value * root.player.length;
+								}
+							}
+						}
 					}
 				}
 
-				Text {
-					color: Style.fg
-					text: root.player.trackAlbum
-				}
+				ListView {
+					id: lyricList
 
-				Text {
-					color: Style.fg
-					text: root.player.trackArtist
-				}
-			}
+					Layout.fillWidth: true
+					Layout.fillHeight: true
 
-			// row 2, column 1 - buttons
-			RowLayout {
-				Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-				spacing: Style.lengths.mini
+					model: lyricModel
+					snapMode: ListView.SnapToItem
+					clip: true
+					interactive: false
 
-				PlayerButton {
-					iconSource: './icons/previous.svg'
-					onClicked: root.player.previous()
-				}
+					highlightRangeMode: ListView.StrictlyEnforceRange
+					preferredHighlightBegin: height / 2
+					preferredHighlightEnd: height / 2
+					highlightMoveDuration: 150
 
-				PlayerButton {
-					iconSource: root.player.playbackState === MprisPlaybackState.Playing
-						? './icons/pause.svg'
-						: './icons/play.svg'
-					onClicked: root.player.togglePlaying()
-				}
+					delegate: Text {
+						required property int index
+						required property string lyricText
 
-				PlayerButton {
-					iconSource: './icons/next.svg'
-					onClicked: root.player.next()
-				}
-			}
+						width: ListView.view.width
+						horizontalAlignment: Text.AlignHCenter
+						text: lyricText
+						color: ListView.isCurrentItem ? Style.fg : Style.fgSubtle
+						font.bold: ListView.isCurrentItem
 
-			// row 2, column 2 - progress bar
-			Item {
-				Layout.fillWidth: true
-				Layout.alignment: Qt.AlignVCenter
-				Layout.preferredHeight: Style.musicPopup.barThickness
-				Layout.rightMargin: Style.lengths.mini
+						Behavior on color { ColorAnimation { duration: 150 } }
+					}
 
-				Slider {
-					anchors.fill: parent
-					vertical: false
-					animate: false // we use FrameAnimation
-					value: root.player && root.player.length > 0 ? (root.player.position / root.player.length) : 0
+					Text {
+						anchors.centerIn: parent
+						visible: parent.count == 0
+						text: 'No lyrics available'
+						color: Style.fgSubtle
+					}
 
-					onMoved: (mappedValue) => {
-						if (root.player && root.player.length > 0) {
-							root.player.position = mappedValue * root.player.length;
+					Rectangle {
+						visible: parent.count != 0
+						anchors.top: parent.top
+						anchors.left: parent.left
+						anchors.right: parent.right
+						height: Style.lengths.medium
+						gradient: Gradient {
+							GradientStop { position: 0.0; color: Style.bgPopup }
+							GradientStop { position: 1.0; color: 'transparent' }
+						}
+					}
+
+					Rectangle {
+						visible: parent.count != 0
+						anchors.bottom: parent.bottom
+						anchors.left: parent.left
+						anchors.right: parent.right
+						height: Style.lengths.medium
+						gradient: Gradient {
+							GradientStop { position: 0.0; color: 'transparent' }
+							GradientStop { position: 1.0; color: Style.bgPopup }
 						}
 					}
 				}
 			}
 		}
-
-		ListView {
-			id: lyricList
-
-			Layout.fillWidth: true
-			Layout.fillHeight: true
-
-			model: lyricModel
-			snapMode: ListView.SnapToItem
-			clip: true
-
-			highlightRangeMode: ListView.StrictlyEnforceRange
-			preferredHighlightBegin: height / 2
-			preferredHighlightEnd: height / 2
-			highlightMoveDuration: 150
-
-			delegate: Text {
-				required property int index
-				required property string lyricText
-
-				width: ListView.view.width
-				horizontalAlignment: Text.AlignHCenter
-				text: lyricText
-				color: ListView.isCurrentItem ? Style.fg : Style.fgSubtle
-				font.bold: ListView.isCurrentItem
-
-				Behavior on color { ColorAnimation { duration: 150 } }
-			}
-
-			ColumnLayout {
-				anchors.centerIn: parent
-				visible: parent.count == 0
-
-				Text {
-					Layout.alignment: Qt.AlignHCenter
-					text: 'No lyrics available'
-					color: Style.fgSubtle
-				}
-
-				Text {
-					Layout.alignment: Qt.AlignHCenter
-					text: 'File name: ' + root.trackFile
-					color: Style.fgSubtle
-				}
-			}
-
-			Rectangle {
-				visible: parent.count != 0
-				anchors.top: parent.top
-				anchors.left: parent.left
-				anchors.right: parent.right
-				height: Style.lengths.medium
-				gradient: Gradient {
-					GradientStop { position: 0.0; color: Style.bgPopup }
-					GradientStop { position: 1.0; color: 'transparent' }
-				}
-			}
-
-			Rectangle {
-				visible: parent.count != 0
-				anchors.bottom: parent.bottom
-				anchors.left: parent.left
-				anchors.right: parent.right
-				height: Style.lengths.medium
-				gradient: Gradient {
-					GradientStop { position: 0.0; color: 'transparent' }
-					GradientStop { position: 1.0; color: Style.bgPopup }
-				}
-			}
-		}
+		// }}}
 	}
 }

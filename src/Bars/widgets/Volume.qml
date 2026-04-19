@@ -24,7 +24,7 @@ Rectangle {
 		value: root.volume
 		fillColor: root.muted ? Style.volume.fillMuted : Style.volume.fill
 
-		onMoved: (value) => {
+		onMoved: value => {
 			if (root.activeSink && root.activeSink.audio) {
 				root.activeSink.audio.volume = value;
 			}
