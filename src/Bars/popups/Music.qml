@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Mpris
@@ -15,9 +16,9 @@ PopupWindow {
 		rect.x: Style.bar.popupGap
 		rect.y: bar.height / 2 - height / 2
 	}
-	implicitWidth: 400
+	implicitWidth: Style.musicPopup.width
 	implicitHeight: Style.musicPopup.height
-	color: Style.popupBg
+	color: Style.bgPopup
 
 	required property PanelWindow bar
 
@@ -128,6 +129,38 @@ PopupWindow {
 		activeLyricIndex = newIndex;
 	}
 
+	component PlayerButton : Item {
+		id: btnRoot
+		width: Style.musicPopup.buttonSize
+		height: Style.musicPopup.buttonSize
+
+		property url iconSource
+		property color color: Style.fgSubtle
+
+		signal clicked()
+
+		Image {
+			id: rawIcon
+			source: btnRoot.iconSource
+			anchors.fill: parent
+			sourceSize: Qt.size(width, height)
+			visible: false
+		}
+
+		MultiEffect {
+			source: rawIcon
+			anchors.fill: rawIcon
+			colorization: 1.0
+			colorizationColor: btnRoot.color
+		}
+
+		MouseArea {
+			anchors.fill: parent
+			cursorShape: Qt.PointingHandCursor
+			onClicked: btnRoot.clicked()
+		}
+	}
+
 	Connections {
 		target: root.player
 
@@ -136,9 +169,15 @@ PopupWindow {
 		}
 	}
 
+	// to smoothly update progress bar
+	FrameAnimation {
+		running: root.visible && root.player && root.player.playbackState === MprisPlaybackState.Playing
+		onTriggered: root.player.positionChanged();
+	}
+
 	Timer {
 		interval: 100
-		running: root.player && root.player.playbackState === MprisPlaybackState.Playing
+		running: root.visible && root.player
 		repeat: true
 		onTriggered: {
 			if (root.needsLyricsLoad) {
@@ -147,30 +186,31 @@ PopupWindow {
 					root.loadLyrics(root.player.metadata["xesam:url"]);
 				}
 			}
-
 			root.updateCurrentLyric();
 		}
 	}
 
 	ColumnLayout {
 		anchors.fill: parent
-		anchors.margins: 8
+		anchors.margins: Style.lengths.small
 
-		RowLayout {
+		GridLayout {
 			Layout.fillWidth: true
-			spacing: 8
+			columns: 2
+			rowSpacing: Style.lengths.small
+			columnSpacing: Style.lengths.small
 
+			// row 1, column 1 - album cover
 			Image {
-				Layout.preferredWidth: 64
-				Layout.preferredHeight: 64
+				Layout.preferredWidth: Style.musicPopup.albumArtSize
+				Layout.preferredHeight: Style.musicPopup.albumArtSize
 				fillMode: Image.PreserveAspectFit
 				mipmap: true // smoother downscale
 				source: root.player.trackArtUrl
 			}
 
+			// row 1, column 2 - info
 			Column {
-				anchors.verticalCenter: parent.verticalCenter
-
 				Text {
 					color: Style.fg
 					text: root.player.trackTitle
@@ -190,6 +230,50 @@ PopupWindow {
 					text: root.player.trackArtist
 				}
 			}
+
+			// row 2, column 1 - buttons
+			RowLayout {
+				Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+				spacing: Style.lengths.mini
+
+				PlayerButton {
+					iconSource: "./icons/previous.svg"
+					onClicked: root.player.previous()
+				}
+
+				PlayerButton {
+					iconSource: root.player.playbackState === MprisPlaybackState.Playing
+						? "./icons/pause.svg"
+						: "./icons/play.svg"
+					onClicked: root.player.togglePlaying()
+				}
+
+				PlayerButton {
+					iconSource: "./icons/next.svg"
+					onClicked: root.player.next()
+				}
+			}
+
+			// row 2, column 2 - progress bar
+			Item {
+				Layout.fillWidth: true
+				Layout.alignment: Qt.AlignVCenter
+				Layout.preferredHeight: Style.musicPopup.barThickness
+				Layout.rightMargin: Style.lengths.mini
+
+				Slider {
+					anchors.fill: parent
+					vertical: false
+					animate: false // we use FrameAnimation
+					value: root.player && root.player.length > 0 ? (root.player.position / root.player.length) : 0
+
+					onMoved: (mappedValue) => {
+						if (root.player && root.player.length > 0) {
+							root.player.position = mappedValue * root.player.length;
+						}
+					}
+				}
+			}
 		}
 
 		ListView {
@@ -205,52 +289,52 @@ PopupWindow {
 			highlightRangeMode: ListView.StrictlyEnforceRange
 			preferredHighlightBegin: height / 2
 			preferredHighlightEnd: height / 2
-			highlightMoveDuration: 250
+			highlightMoveDuration: 150
 
 			delegate: Text {
 				required property int index
 				required property string lyricText
 
 				width: ListView.view.width
-				// horizontalAlignment: Text.AlignHCenter
+				horizontalAlignment: Text.AlignHCenter
 				text: lyricText
 				color: ListView.isCurrentItem ? Style.fg : Style.fgSubtle
 				font.bold: ListView.isCurrentItem
-				font.pixelSize: ListView.isCurrentItem ? 13 : 13
 
 				Behavior on color { ColorAnimation { duration: 150 } }
-				Behavior on font.pixelSize { NumberAnimation { duration: 150 } }
 			}
 
-			Text {
-				anchors.fill: parent
-				// horizontalAlignment: Qt.AlignHCenter
-				verticalAlignment: Qt.AlignVCenter
+			Column {
+				anchors.centerIn: parent
 				visible: parent.count == 0
-				text: 'No lyrics available'
-				color: Style.fgSubtle
-				font.pixelSize: 13
+
+				Text {
+					text: 'No lyrics available'
+					color: Style.fgSubtle
+				}
 			}
 
 			Rectangle {
+				visible: parent.count != 0
 				anchors.top: parent.top
 				anchors.left: parent.left
 				anchors.right: parent.right
-				height: 16
+				height: Style.lengths.medium
 				gradient: Gradient {
-					GradientStop { position: 0.0; color: Style.popupBg }
+					GradientStop { position: 0.0; color: Style.bgPopup }
 					GradientStop { position: 1.0; color: "transparent" }
 				}
 			}
 
 			Rectangle {
+				visible: parent.count != 0
 				anchors.bottom: parent.bottom
 				anchors.left: parent.left
 				anchors.right: parent.right
-				height: 16
+				height: Style.lengths.medium
 				gradient: Gradient {
 					GradientStop { position: 0.0; color: "transparent" }
-					GradientStop { position: 1.0; color: Style.popupBg }
+					GradientStop { position: 1.0; color: Style.bgPopup }
 				}
 			}
 		}

@@ -23,13 +23,39 @@ PanelWindow {
 		niri: root.niri
 	}
 
+	// {{{ middle section
+	property bool showMusic: false
+
+	property bool volumeHovered: false
 	Volume {
 		anchors.verticalCenter: parent.verticalCenter
+		HoverHandler {
+			onHoveredChanged: root.volumeHovered = hovered
+		}
+	}
+	Timer {
+		id: showTimer
+		interval: 0
+		running: root.volumeHovered && !root.showMusic
+		onTriggered: root.showMusic = true
 	}
 
+	property bool musicHovered: false
 	Music {
+		id: musicPopup
 		bar: root
+		visible: root.showMusic
+		HoverHandler {
+			onHoveredChanged: root.musicHovered = hovered
+		}
 	}
+	Timer {
+		id: hideTimer
+		interval: 100
+		running: !root.volumeHovered && !root.musicHovered && root.showMusic
+		onTriggered: root.showMusic = false
+	}
+	// }}}
 
 	Clock {
 		anchors.bottom: parent.bottom

@@ -1,2 +1,3 @@
 module Shared
 singleton Style 1.0 Style.qml
+Slider 1.0 Slider.qml
