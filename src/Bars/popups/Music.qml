@@ -22,7 +22,7 @@ PopupWindow {
 
 	required property PanelWindow bar
 
-	property string preferred: "io.github.quodlibet.QuodLibet"
+	property string preferred: 'io.github.quodlibet.QuodLibet'
 	property MprisPlayer player: selectPlayer()
 
 	function selectPlayer() {
@@ -34,6 +34,15 @@ PopupWindow {
 		return null;
 	}
 
+	property string trackFile: {
+		const url = player.metadata['xesam:url'];
+		if (url) {
+			const decoded = decodeURI(url);
+			return decoded.substring(decoded.lastIndexOf('/') + 1);
+		} else {
+			return 'not found';
+		}
+	}
 	property bool needsLyricsLoad: true
 	property int activeLyricIndex: -1
 
@@ -54,7 +63,7 @@ PopupWindow {
 		if (!audioUrl || !audioUrl.startsWith('file://')) return;
 
 		const xhr = new XMLHttpRequest();
-		xhr.open("GET", audioUrl.substring(0, audioUrl.lastIndexOf('.')) + '.lrc');
+		xhr.open('GET', audioUrl.substring(0, audioUrl.lastIndexOf('.')) + '.lrc');
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState !== XMLHttpRequest.DONE) return;
 			if (xhr.status === 200 || xhr.status === 0) {
@@ -165,7 +174,9 @@ PopupWindow {
 		target: root.player
 
 		function onMetadataChanged() {
-			root.needsLyricsLoad = true;
+			if (root.player && root.player.metadata) {
+				root.loadLyrics(root.player.metadata["xesam:url"]);
+			}
 		}
 	}
 
@@ -237,19 +248,19 @@ PopupWindow {
 				spacing: Style.lengths.mini
 
 				PlayerButton {
-					iconSource: "./icons/previous.svg"
+					iconSource: './icons/previous.svg'
 					onClicked: root.player.previous()
 				}
 
 				PlayerButton {
 					iconSource: root.player.playbackState === MprisPlaybackState.Playing
-						? "./icons/pause.svg"
-						: "./icons/play.svg"
+						? './icons/pause.svg'
+						: './icons/play.svg'
 					onClicked: root.player.togglePlaying()
 				}
 
 				PlayerButton {
-					iconSource: "./icons/next.svg"
+					iconSource: './icons/next.svg'
 					onClicked: root.player.next()
 				}
 			}
@@ -304,12 +315,19 @@ PopupWindow {
 				Behavior on color { ColorAnimation { duration: 150 } }
 			}
 
-			Column {
+			ColumnLayout {
 				anchors.centerIn: parent
 				visible: parent.count == 0
 
 				Text {
+					Layout.alignment: Qt.AlignHCenter
 					text: 'No lyrics available'
+					color: Style.fgSubtle
+				}
+
+				Text {
+					Layout.alignment: Qt.AlignHCenter
+					text: 'File name: ' + root.trackFile
 					color: Style.fgSubtle
 				}
 			}
@@ -322,7 +340,7 @@ PopupWindow {
 				height: Style.lengths.medium
 				gradient: Gradient {
 					GradientStop { position: 0.0; color: Style.bgPopup }
-					GradientStop { position: 1.0; color: "transparent" }
+					GradientStop { position: 1.0; color: 'transparent' }
 				}
 			}
 
@@ -333,7 +351,7 @@ PopupWindow {
 				anchors.right: parent.right
 				height: Style.lengths.medium
 				gradient: Gradient {
-					GradientStop { position: 0.0; color: "transparent" }
+					GradientStop { position: 0.0; color: 'transparent' }
 					GradientStop { position: 1.0; color: Style.bgPopup }
 				}
 			}
