@@ -1,4 +1,7 @@
 module Shared
-singleton Style 1.0 Style.qml
-Slider 1.0 Slider.qml
+
+ImageButton 1.0 ImageButton.qml
 PopupController 1.0 PopupController.qml
+Slider 1.0 Slider.qml
+
+singleton Style 1.0 Style.qml
