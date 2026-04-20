@@ -124,9 +124,10 @@ PopupWindow {
 			target: root
 
 			function onVisibleChanged() {
-				if (root.visible) {
+				if (root.visible && musicRoot.player) {
 					// re-sync lyrics because the timers were not active when the popup was closed
 					musicRoot.updateCurrentLyric();
+					musicRoot.visualPosition = musicRoot.player.position;
 				}
 			}
 		}
