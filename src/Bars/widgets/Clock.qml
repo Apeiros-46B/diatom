@@ -18,6 +18,7 @@ Item {
 		min = d.getMinutes();
 	}
 
+	// TODO: should probably use SystemClock
 	Timer {
 		interval: 10000
 		running: true

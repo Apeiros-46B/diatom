@@ -27,18 +27,18 @@ PanelWindow {
 	property bool volumeHovered: false
 	property bool musicHovered: false
 
+	Volume {
+		anchors.verticalCenter: parent.verticalCenter
+		HoverHandler {
+			onHoveredChanged: root.volumeHovered = hovered
+		}
+	}
+
 	Music {
 		id: musicPopup
 		bar: root
 		HoverHandler {
 			onHoveredChanged: root.musicHovered = hovered
-		}
-	}
-
-	Volume {
-		anchors.verticalCenter: parent.verticalCenter
-		HoverHandler {
-			onHoveredChanged: root.volumeHovered = hovered
 		}
 	}
 
@@ -50,7 +50,28 @@ PanelWindow {
 	}
 	// }}}
 
+	property bool clockHovered: false
+	property bool calendarHovered: false
+
 	Clock {
 		anchors.bottom: parent.bottom
+		HoverHandler {
+			onHoveredChanged: root.clockHovered = hovered
+		}
+	}
+
+	Calendar {
+		id: calendarPopup
+		bar: root
+		HoverHandler {
+			onHoveredChanged: root.calendarHovered = hovered
+		}
+	}
+
+	PopupController {
+		id: calenderController
+		target: calendarPopup
+		triggerHovered: root.clockHovered
+		targetHovered: root.calendarHovered
 	}
 }

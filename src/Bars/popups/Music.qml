@@ -15,8 +15,8 @@ PopupWindow {
 		rect.x: Style.bar.popupGap
 		rect.y: bar.height / 2 - height / 2
 	}
-	implicitWidth: Style.musicPopup.width
-	implicitHeight: Style.musicPopup.height
+	implicitWidth: Style.volume.height * 2
+	implicitHeight: Style.volume.height
 	color: Style.bgPopup
 
 	required property PanelWindow bar
@@ -27,8 +27,8 @@ PopupWindow {
 	component MusicPage: Item {
 		id: musicRoot
 
-		property string preferredPlayer: 'io.github.quodlibet.QuodLibet'
-		final property MprisPlayer player: {
+		property string preferredPlayer: "io.github.quodlibet.QuodLibet"
+		final readonly property MprisPlayer player: {
 			for (const candidate of Mpris.players.values) {
 				if (candidate.desktopEntry === preferredPlayer) {
 					return candidate;
@@ -57,10 +57,10 @@ PopupWindow {
 			lyricModel.clear();
 			activeLyricIndex = -1;
 
-			if (!audioUrl || !audioUrl.startsWith('file://')) return;
+			if (!audioUrl || !audioUrl.startsWith("file://")) return;
 
 			const xhr = new XMLHttpRequest();
-			xhr.open('GET', audioUrl.substring(0, audioUrl.lastIndexOf('.')) + '.lrc');
+			xhr.open("GET", audioUrl.substring(0, audioUrl.lastIndexOf(".")) + ".lrc");
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState !== XMLHttpRequest.DONE) return;
 				if (xhr.status === 200 || xhr.status === 0) {
@@ -71,7 +71,7 @@ PopupWindow {
 		}
 
 		function parseLrc(text) {
-			const lines = text.split('\n');
+			const lines = text.split("\n");
 			const parsed = [];
 			const timeRegex = /\[(\d+):(\d+\.\d+)\]/g;
 
@@ -89,9 +89,9 @@ PopupWindow {
 				}
 
 				if (times.length > 0) {
-					var lyricText = line.replace(timeRegex, '').trim();
-					if (lyricText === '') {
-						lyricText = '♪';
+					var lyricText = line.replace(timeRegex, "").trim();
+					if (lyricText === "") {
+						lyricText = "♪";
 					}
 
 					// separate entry for each timestamp
@@ -220,7 +220,7 @@ PopupWindow {
 		// {{{ background art
 		Image {
 			id: bgArt
-			source: musicRoot.player ? musicRoot.player.trackArtUrl : ''
+			source: musicRoot.player ? musicRoot.player.trackArtUrl : ""
 			anchors.fill: parent
 			fillMode: Image.PreserveAspectCrop
 			visible: false
@@ -258,7 +258,7 @@ PopupWindow {
 		Text {
 			anchors.centerIn: parent
 			visible: musicRoot.player === null
-			text: 'No music playing'
+			text: "No music playing"
 			color: Style.fg
 		}
 
@@ -310,19 +310,19 @@ PopupWindow {
 					spacing: Style.lengths.mini
 
 					ImageButton {
-						iconSource: Qt.resolvedUrl('./icons/previous.svg')
+						iconSource: Qt.resolvedUrl("./icons/previous.svg")
 						onClicked: musicRoot.player.previous()
 					}
 
 					ImageButton {
 						iconSource: musicRoot.player.playbackState === MprisPlaybackState.Playing
-							? Qt.resolvedUrl('./icons/pause.svg')
-							: Qt.resolvedUrl('./icons/play.svg')
+							? Qt.resolvedUrl("./icons/pause.svg")
+							: Qt.resolvedUrl("./icons/play.svg")
 						onClicked: musicRoot.player.togglePlaying()
 					}
 
 					ImageButton {
-						iconSource: Qt.resolvedUrl('./icons/next.svg')
+						iconSource: Qt.resolvedUrl("./icons/next.svg")
 						onClicked: musicRoot.player.next()
 					}
 				}
@@ -393,7 +393,7 @@ PopupWindow {
 				Text {
 					anchors.centerIn: parent
 					visible: parent.count == 0
-					text: 'No lyrics available'
+					text: "No lyrics available"
 					color: Style.fgSubtle
 				}
 
@@ -404,10 +404,10 @@ PopupWindow {
 					layer.enabled: true
 					gradient: Gradient {
 						orientation: Gradient.Vertical
-						GradientStop { position: 0.05; color: 'transparent' }
-						GradientStop { position: 0.45; color: 'white' }
-						GradientStop { position: 0.55; color: 'white' }
-						GradientStop { position: 0.95; color: 'transparent' }
+						GradientStop { position: 0.05; color: "transparent" }
+						GradientStop { position: 0.45; color: "white" }
+						GradientStop { position: 0.55; color: "white" }
+						GradientStop { position: 0.95; color: "transparent" }
 					}
 				}
 
@@ -433,8 +433,8 @@ PopupWindow {
 		}
 		z: 10
 		iconSource: root.settingsOpen
-			? Qt.resolvedUrl('./icons/disc.svg')
-			: Qt.resolvedUrl('./icons/mix.svg')
+			? Qt.resolvedUrl("./icons/disc.svg")
+			: Qt.resolvedUrl("./icons/mix.svg")
 		onClicked: root.settingsOpen = !root.settingsOpen
 	}
 
@@ -445,7 +445,7 @@ PopupWindow {
 		Item {
 			Text {
 				anchors.centerIn: parent
-				text: 'TODO: Audio settings'
+				text: "TODO: Audio settings"
 				color: Style.fgSubtle
 			}
 		}

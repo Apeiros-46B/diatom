@@ -10,20 +10,21 @@ QtObject {
 	readonly property color fg: Theme.fg0
 	readonly property color fgSubtle: Theme.fg3
 	readonly property color bgPopup: Theme.bg1
+	readonly property color bgPopup2: Theme.bg2
 	readonly property color bgRaised: Theme.bg3
 	readonly property color accent: Theme.blue
 
 	readonly property var lengths: QtObject {
 		readonly property int tiny: 2
 		readonly property int mini: 4
-		readonly property int small: 8
+		readonly property int small: 8 // should match wm gap size
 		readonly property int medium: 16
 		readonly property int huge: 64
 	}
 
 	readonly property var bar: QtObject {
 		readonly property int width: root.lengths.small
-		readonly property int popupGap: width * 2
+		readonly property int popupGap: width + root.lengths.small
 	}
 
 	readonly property var workspace: QtObject {
@@ -43,8 +44,6 @@ QtObject {
 	}
 
 	readonly property var musicPopup: QtObject {
-		readonly property int height: root.volume.height
-		readonly property int width: height * 2
 		readonly property int buttonSize: root.lengths.medium
 		readonly property int barThickness: root.lengths.mini
 		readonly property int albumArtSize: root.lengths.huge
@@ -61,6 +60,9 @@ QtObject {
 		readonly property int barHeight: root.lengths.small * 3
 		readonly property color fill: Theme.fg3
 		readonly property color track: Theme.bg2
+	}
+
+	readonly property var calendarPopup: QtObject {
 	}
 
 	readonly property var genericSlider: QtObject {

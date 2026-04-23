@@ -63,7 +63,7 @@ Item {
 			if (pressedButtons & Qt.LeftButton) emitValue(ev);
 		}
 		onWheel: (ev) => {
-			const delta = (ev.angleDelta.y > 0) ? root.stepSize : -root.stepSize;
+			const delta = ev.angleDelta.y > 0 ? root.stepSize : -root.stepSize;
 			var mapped = Math.max(0.0, Math.min(1.0, root.value + delta))
 			if (root.round) {
 				mapped = Math.round(mapped * root.stepCount) / root.stepCount;
