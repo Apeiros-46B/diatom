@@ -22,6 +22,14 @@ PopupWindow {
 
 	property string preferredPlayer: "io.github.quodlibet.QuodLibet"
 
+	// TODO: parameterize by theme
+	Image {
+		id: lutTexture
+		source: "./shaders/everforest_lut.png"
+		visible: false
+		smooth: false // prevent bleeding between discontinuous LUT slices
+	}
+
 	// {{{ music page
 	Item {
 		id: musicRoot
@@ -274,11 +282,23 @@ PopupWindow {
 
 				// row 1, column 1 - album cover
 				Image {
+					id: art
 					Layout.preferredWidth: Style.musicPopup.albumArtSize
 					Layout.preferredHeight: Style.musicPopup.albumArtSize
 					fillMode: Image.PreserveAspectFit
 					mipmap: true // smoother downscale
 					source: musicRoot.player.trackArtUrl
+
+					layer.enabled: true
+					layer.effect: ShaderEffect {
+						anchors.fill: art
+						visible: musicRoot.player !== null
+
+						property variant source: art
+						property variant lut: lutTexture
+
+						fragmentShader: "./shaders/image_lut.frag.qsb"
+					}
 				}
 
 				// row 1, column 2 - info
