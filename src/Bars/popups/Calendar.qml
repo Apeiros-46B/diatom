@@ -14,11 +14,6 @@ PopupWindow {
 		rect.x: Style.bar.popupGap
 		rect.y: bar.height - height - Style.lengths.small
 	}
-	implicitWidth: implicitHeight
-	implicitHeight: Style.clock.barHeight * 12
-		+ Style.clock.spacing * 8
-		+ Style.clock.spacingBig * 3
-		- Style.lengths.small
 	color: Style.bgPopup
 
 	required property PanelWindow bar
@@ -28,7 +23,21 @@ PopupWindow {
 	SystemClock {
 		id: clock
 		enabled: root.visible
-		precision: SystemClock.Minutes
+		precision: SystemClock.Seconds
+	}
+
+	final readonly property string dateStr: {
+		const date = Qt.formatDateTime(clock.date, "MM.dd");
+		var day = clock.date.getDay();
+		if (day == 0) {
+			day = 7;
+		}
+		return `${date}:${day}`;
+	}
+	final readonly property string timeStr: {
+		const hours = clock.hours.toString().padStart(2, '0');
+		const minutes = clock.minutes.toString().padStart(2, '0');
+		return `${hours}:${minutes}`;
 	}
 
 	Connections {
@@ -44,32 +53,30 @@ PopupWindow {
 	ColumnLayout {
 		anchors.fill: parent
 
-		Text {
-			Layout.topMargin: Style.lengths.small
-			Layout.leftMargin: Style.lengths.small
-
-			// for some reason Qt.formatDate on clock.date does not update automatically
-			text: `${clock.hours.toString().padStart(2, '0')}:${clock.minutes.toString().padStart(2, '0')}`
-			color: Style.fg
-			font {
-				pixelSize: 24
-				bold: true
-			}
-		}
-
 		RowLayout {
 			Layout.fillWidth: true
 			Layout.fillHeight: true
 
+			Layout.topMargin: Style.lengths.small
 			Layout.leftMargin: Style.lengths.small
 			Layout.rightMargin: Style.lengths.small
 			Layout.bottomMargin: Style.lengths.small
 
+			spacing: Style.lengths.small * 2
+
 			// {{{ calendar
 			ColumnLayout {
 				Layout.fillHeight: true
-				Layout.maximumWidth: 210
 				spacing: Style.lengths.mini
+
+				Text {
+					text: root.dateStr
+					color: Style.fg
+					font {
+						pixelSize: Style.calendarPopup.headerFontPx
+						bold: true
+					}
+				}
 
 				Text {
 					text: Qt.formatDateTime(root.selectedDate, "MMMM yyyy")
@@ -82,7 +89,7 @@ PopupWindow {
 				MonthGrid {
 					id: monthGrid
 					Layout.fillWidth: true
-					Layout.maximumWidth: 200
+					Layout.maximumWidth: root.width / 2 - Style.lengths.small * 2
 					Layout.preferredHeight: (width / 7) * 6
 
 					month: root.selectedDate.getMonth()
@@ -150,6 +157,15 @@ PopupWindow {
 				spacing: Style.lengths.mini
 
 				Text {
+					text: root.timeStr
+					color: Style.fg
+					font {
+						pixelSize: Style.calendarPopup.headerFontPx
+						bold: true
+					}
+				}
+
+				Text {
 					text: "Events"
 					color: Style.fg
 					font.bold: true
@@ -201,7 +217,7 @@ PopupWindow {
 			id: worldClocks
 
 			Layout.fillWidth: true
-			Layout.preferredHeight: 64
+			Layout.preferredHeight: Style.calendarPopup.worldClockHeight
 			color: Style.bgPopup2
 
 			// tick param exists to make qml tick this function every minute
@@ -224,6 +240,7 @@ PopupWindow {
 				Repeater {
 					model: [
 						{ city: "Vancouver", offset: -7 },
+						{ city: "Toronto", offset: -4 },
 						{ city: "Berlin", offset: 2 },
 						{ city: "Beijing", offset: 8 }
 					]

@@ -29,6 +29,7 @@ PanelWindow {
 
 	Volume {
 		anchors.verticalCenter: parent.verticalCenter
+		id: volume
 		HoverHandler {
 			onHoveredChanged: root.volumeHovered = hovered
 		}
@@ -37,6 +38,8 @@ PanelWindow {
 	Music {
 		id: musicPopup
 		bar: root
+		implicitWidth: height * 2
+		implicitHeight: volume.height
 		HoverHandler {
 			onHoveredChanged: root.musicHovered = hovered
 		}
@@ -50,11 +53,13 @@ PanelWindow {
 	}
 	// }}}
 
+	// {{{ bottom section
 	property bool clockHovered: false
 	property bool calendarHovered: false
 
 	Clock {
 		anchors.bottom: parent.bottom
+		id: clock
 		HoverHandler {
 			onHoveredChanged: root.clockHovered = hovered
 		}
@@ -63,6 +68,8 @@ PanelWindow {
 	Calendar {
 		id: calendarPopup
 		bar: root
+		implicitWidth: musicPopup.width
+		implicitHeight: clock.height - Style.lengths.small
 		HoverHandler {
 			onHoveredChanged: root.calendarHovered = hovered
 		}
@@ -74,4 +81,5 @@ PanelWindow {
 		triggerHovered: root.clockHovered
 		targetHovered: root.calendarHovered
 	}
+	// }}}
 }

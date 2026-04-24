@@ -63,6 +63,8 @@ QtObject {
 	}
 
 	readonly property var calendarPopup: QtObject {
+		readonly property int headerFontPx: 24
+		readonly property int worldClockHeight: 64
 	}
 
 	readonly property var genericSlider: QtObject {

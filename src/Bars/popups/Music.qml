@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
@@ -15,22 +16,20 @@ PopupWindow {
 		rect.x: Style.bar.popupGap
 		rect.y: bar.height / 2 - height / 2
 	}
-	implicitWidth: Style.volume.height * 2
-	implicitHeight: Style.volume.height
 	color: Style.bgPopup
 
 	required property PanelWindow bar
 
-	final property bool settingsOpen: false
+	property string preferredPlayer: "io.github.quodlibet.QuodLibet"
 
 	// {{{ music page
-	component MusicPage: Item {
+	Item {
 		id: musicRoot
+		anchors.fill: parent
 
-		property string preferredPlayer: "io.github.quodlibet.QuodLibet"
 		final readonly property MprisPlayer player: {
 			for (const candidate of Mpris.players.values) {
-				if (candidate.desktopEntry === preferredPlayer) {
+				if (candidate.desktopEntry === root.preferredPlayer) {
 					return candidate;
 				}
 			}
@@ -423,33 +422,4 @@ PopupWindow {
 		// }}}
 	}
 	// }}}
-
-	// switch pages
-	ImageButton {
-		anchors {
-			top: parent.top
-			right: parent.right
-			margins: Style.lengths.small
-		}
-		z: 10
-		iconSource: root.settingsOpen
-			? Qt.resolvedUrl("./icons/disc.svg")
-			: Qt.resolvedUrl("./icons/mix.svg")
-		onClicked: root.settingsOpen = !root.settingsOpen
-	}
-
-	StackLayout {
-		anchors.fill: parent
-		currentIndex: root.settingsOpen ? 0 : 1
-
-		Item {
-			Text {
-				anchors.centerIn: parent
-				text: "TODO: Audio settings"
-				color: Style.fgSubtle
-			}
-		}
-
-		MusicPage {}
-	}
 }
