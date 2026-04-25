@@ -13,7 +13,7 @@ Item {
 	property bool pinned: false
 
 	property int showDelay: 0
-	property int hideDelay: 150
+	property int hideDelay: 100
 
 	property bool hoverTriggered: false
 	readonly property bool isOpen: pinned || hoverTriggered

@@ -26,6 +26,7 @@ PopupWindow {
 	Image {
 		id: lutTexture
 		source: "./shaders/everforest_lut.png"
+		// asynchronous: true
 		visible: false
 		smooth: false // prevent bleeding between discontinuous LUT slices
 	}
@@ -227,10 +228,17 @@ PopupWindow {
 		// {{{ background art
 		Image {
 			id: bgArt
-			source: musicRoot.player ? musicRoot.player.trackArtUrl : ""
 			anchors.fill: parent
+
+			// we are blurring it so we can load at low res
+			sourceSize.width: 256 * Screen.devicePixelRatio
+			sourceSize.height: 256 * Screen.devicePixelRatio
 			fillMode: Image.PreserveAspectCrop
+
+			asynchronous: true
 			visible: false
+
+			source: musicRoot.player ? musicRoot.player.trackArtUrl : ""
 		}
 
 		MultiEffect {
@@ -285,8 +293,16 @@ PopupWindow {
 					id: art
 					Layout.preferredWidth: Style.musicPopup.albumArtSize
 					Layout.preferredHeight: Style.musicPopup.albumArtSize
+
+					// scale the image before loading it into memory
+					sourceSize.width: Style.musicPopup.albumArtSize * Screen.devicePixelRatio
+					sourceSize.height: Style.musicPopup.albumArtSize * Screen.devicePixelRatio
+
 					fillMode: Image.PreserveAspectFit
+
+					asynchronous: true
 					mipmap: true // smoother downscale
+
 					source: musicRoot.player.trackArtUrl
 
 					layer.enabled: true
@@ -294,7 +310,6 @@ PopupWindow {
 						anchors.fill: art
 						visible: musicRoot.player !== null
 
-						property variant source: art
 						property variant lut: lutTexture
 
 						fragmentShader: "./shaders/image_lut.frag.qsb"

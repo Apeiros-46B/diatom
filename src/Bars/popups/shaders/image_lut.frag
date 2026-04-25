@@ -12,7 +12,7 @@ layout(std140, binding = 0) uniform buf {
 layout(binding = 1) uniform sampler2D source;
 layout(binding = 2) uniform sampler2D lut;
 
-const float LUT_LEVEL = 16.0;
+const float LUT_LEVEL = 12.0;
 
 void main() {
 	vec4 inputColor = texture(source, qt_TexCoord0);
