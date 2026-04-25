@@ -51,7 +51,7 @@ QtObject {
 		readonly property color bgArtDark: root.bgPopup
 		readonly property color bgArtLight: root.fgSubtle
 		readonly property color progressFill: Theme.blue
-		readonly property color progressTrack: root.bgRaised
+		readonly property color progressTrack: 'transparent'
 	}
 
 	readonly property var clock: QtObject {

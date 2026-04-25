@@ -251,7 +251,7 @@ PopupWindow {
 			layer.enabled: true
 
 			blurEnabled: true
-			blurMax: 36
+			blurMax: 32
 			blur: 1.0
 		}
 
