@@ -47,7 +47,7 @@ QtObject {
 		readonly property int buttonSize: root.lengths.medium
 		readonly property int barThickness: root.lengths.mini
 		readonly property int albumArtSize: root.lengths.huge
-		readonly property real bgArtOpacity: 0.3
+		readonly property real bgArtOpacity: 0.2
 		readonly property color bgArtDark: root.bgPopup
 		readonly property color bgArtLight: root.fgSubtle
 		readonly property color progressFill: Theme.blue

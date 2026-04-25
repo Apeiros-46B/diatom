@@ -26,7 +26,7 @@ PopupWindow {
 	Image {
 		id: lutTexture
 		source: "./shaders/everforest_lut.png"
-		// asynchronous: true
+		asynchronous: false // dont use async for shader resources
 		visible: false
 		smooth: false // prevent bleeding between discontinuous LUT slices
 	}
@@ -43,6 +43,9 @@ PopupWindow {
 				}
 			}
 			return null;
+		}
+		final readonly property double largestArtSize: {
+			return Math.max(musicRoot.width, musicRoot.height) / 2 * Screen.devicePixelRatio
 		}
 
 		// for slider, updated by FrameAnimation
@@ -230,9 +233,8 @@ PopupWindow {
 			id: bgArt
 			anchors.fill: parent
 
-			// we are blurring it so we can load at low res
-			sourceSize.width: 256 * Screen.devicePixelRatio
-			sourceSize.height: 256 * Screen.devicePixelRatio
+			sourceSize.width: musicRoot.largestArtSize
+			sourceSize.height: musicRoot.largestArtSize
 			fillMode: Image.PreserveAspectCrop
 
 			asynchronous: true
@@ -251,7 +253,6 @@ PopupWindow {
 			blurEnabled: true
 			blurMax: 36
 			blur: 1.0
-			contrast: 1.2
 		}
 
 		ShaderEffect {
@@ -261,10 +262,9 @@ PopupWindow {
 			opacity: Style.musicPopup.bgArtOpacity
 
 			property variant source: bgArtProcessed
-			property color colorDark: Style.musicPopup.bgArtDark
-			property color colorLight: Style.musicPopup.bgArtLight
+			property variant lut: lutTexture
 
-			fragmentShader: "./shaders/image_ramp.frag.qsb"
+			fragmentShader: "./shaders/image_lut.frag.qsb"
 		}
 		// }}}
 
@@ -294,10 +294,8 @@ PopupWindow {
 					Layout.preferredWidth: Style.musicPopup.albumArtSize
 					Layout.preferredHeight: Style.musicPopup.albumArtSize
 
-					// scale the image before loading it into memory
-					sourceSize.width: Style.musicPopup.albumArtSize * Screen.devicePixelRatio
-					sourceSize.height: Style.musicPopup.albumArtSize * Screen.devicePixelRatio
-
+					sourceSize.width: musicRoot.largestArtSize
+					sourceSize.height: musicRoot.largestArtSize
 					fillMode: Image.PreserveAspectFit
 
 					asynchronous: true
