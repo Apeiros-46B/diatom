@@ -249,9 +249,9 @@ PopupWindow {
 			layer.enabled: true
 
 			blurEnabled: true
-			blurMax: 42
+			blurMax: 36
 			blur: 1.0
-			contrast: 1.5
+			contrast: 1.2
 		}
 
 		ShaderEffect {
