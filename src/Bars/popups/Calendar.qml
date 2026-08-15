@@ -9,16 +9,15 @@ import Shared
 
 PopupWindow {
 	id: root
-	anchor {
-		window: bar
-		rect.x: Style.bar.popupGap
-		rect.y: bar.height - height - Style.lengths.small
-	}
-	color: Style.bgPopup
 
 	required property PanelWindow bar
 
-	final property date selectedDate: new Date()
+	anchor {
+		window: bar
+		rect.x: Style.bar.popupGap
+		rect.y: bar.height - height
+	}
+	color: Style.bgPopup
 
 	SystemClock {
 		id: clock
@@ -39,6 +38,8 @@ PopupWindow {
 		const minutes = clock.minutes.toString().padStart(2, '0');
 		return `${hours}:${minutes}`;
 	}
+
+	final property date selectedDate: new Date()
 
 	Connections {
 		target: root
@@ -249,7 +250,6 @@ PopupWindow {
 						id: clockRoot
 						required property var modelData
 
-						// Force equal distribution regardless of text width
 						Layout.fillWidth: true
 						Layout.preferredWidth: 1
 						Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter

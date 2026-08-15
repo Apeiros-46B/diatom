@@ -305,7 +305,6 @@ PopupWindow {
 
 					layer.enabled: true
 					layer.effect: ShaderEffect {
-						anchors.fill: art
 						visible: musicRoot.player !== null
 
 						property variant lut: lutTexture

@@ -13,6 +13,7 @@ QtObject {
 	readonly property color bgPopup2: Theme.bg2
 	readonly property color bgRaised: Theme.bg3
 	readonly property color accent: Theme.blue
+	readonly property color bgAccent: Theme.bgBlue
 
 	readonly property var lengths: QtObject {
 		readonly property int tiny: 2
@@ -23,8 +24,19 @@ QtObject {
 	}
 
 	readonly property var bar: QtObject {
-		readonly property int width: root.lengths.small
-		readonly property int popupGap: width + root.lengths.small
+		// TODO: rename to thickness
+		readonly property int thickness: root.lengths.small
+		readonly property int popupGap: thickness + root.lengths.small
+	}
+
+	readonly property var minimap: QtObject {
+		readonly property int spacingOuter: root.lengths.mini
+		readonly property int spacingInner: root.lengths.tiny
+		readonly property int width: root.lengths.huge * 2
+		readonly property color urgent: Theme.red
+		readonly property color focused: Theme.blue
+		readonly property color focusedCol: Theme.fg3
+		readonly property color unfocused: Theme.bg3
 	}
 
 	readonly property var workspace: QtObject {
@@ -37,7 +49,7 @@ QtObject {
 	}
 
 	readonly property var volume: QtObject {
-		readonly property int height: root.bar.width * 25
+		readonly property int height: root.bar.thickness * 25
 		readonly property color fill: Theme.green
 		readonly property color fillMuted: Theme.fg3
 		readonly property color track: Theme.bg2
@@ -72,4 +84,3 @@ QtObject {
 		readonly property color track: Theme.bg2
 	}
 }
-

@@ -6,7 +6,7 @@ import Shared
 
 Item {
 	id: root
-	width: Style.bar.width
+	width: Style.bar.thickness
 	height: 12 * Style.clock.barHeight + 8 * Style.clock.spacing + 3 * Style.clock.spacingBig
 
 	property int hour: 0
@@ -36,10 +36,11 @@ Item {
 
 			Column {
 				id: group
-				spacing: Style.clock.spacing
 
 				required property int index
 				readonly property int idx: index
+
+				spacing: Style.clock.spacing
 
 				Repeater {
 					model: 3
@@ -58,7 +59,7 @@ Item {
 
 	component ClockBar: Rectangle {
 		id: bar
-		width: Style.bar.width
+		width: Style.bar.thickness
 		height: Style.clock.barHeight
 		color: Style.clock.track
 

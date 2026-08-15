@@ -3,15 +3,17 @@ import Quickshell
 import Niri
 
 import Shared
-import "../Bars/widgets"
 
 PanelWindow {
 	id: root
+
+	required property Niri niri
+
 	anchors {
-		left: true
-		top: true
 		bottom: true
+		left: true
+		right: true
 	}
-	implicitWidth: Style.bar.width * 2;
-	color: Style.bg;
+	implicitHeight: Style.bar.thickness
+	color: Style.bg
 }

@@ -5,7 +5,7 @@ import Shared
 
 Rectangle {
 	id: root
-	width: Style.bar.width
+	width: Style.bar.thickness
 	height: Style.volume.height
 	color: Style.volume.track
 

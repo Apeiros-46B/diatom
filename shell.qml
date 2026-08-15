@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import Niri
@@ -18,11 +20,27 @@ ShellRoot {
 		}
 	}
 
-	LeftBar {
-		niri: niriInstance
-	}
+	Variants {
+		model: Quickshell.screens
 
-	RightBar {
-		niri: niriInstance
+		Scope {
+			id: root
+			property ShellScreen modelData
+
+			TopBar {
+				niri: niriInstance
+				output: root.modelData
+			}
+			BottomBar {
+				niri: niriInstance
+			}
+			LeftBar {
+				niri: niriInstance
+				output: root.modelData.name
+			}
+			RightBar {
+				niri: niriInstance
+			}
+		}
 	}
 }

@@ -8,19 +8,22 @@ import "./popups"
 
 PanelWindow {
 	id: root
+
+	required property Niri niri
+	required property ShellScreen output
+
 	anchors {
 		left: true
 		top: true
 		bottom: true
 	}
-	implicitWidth: Style.bar.width
+	implicitWidth: Style.bar.thickness
 	color: Style.bg
-
-	required property Niri niri
 
 	Workspaces {
 		anchors.top: parent.top
 		niri: root.niri
+		output: root.output
 	}
 
 	// {{{ middle section
@@ -50,6 +53,7 @@ PanelWindow {
 		target: musicPopup
 		triggerHovered: root.volumeHovered
 		targetHovered: root.musicHovered
+		pinned: root.niri.overview.isOpen
 	}
 	// }}}
 
@@ -69,7 +73,7 @@ PanelWindow {
 		id: calendarPopup
 		bar: root
 		implicitWidth: musicPopup.width
-		implicitHeight: clock.height - Style.lengths.small
+		implicitHeight: clock.height
 		HoverHandler {
 			onHoveredChanged: root.calendarHovered = hovered
 		}
@@ -80,6 +84,7 @@ PanelWindow {
 		target: calendarPopup
 		triggerHovered: root.clockHovered
 		targetHovered: root.calendarHovered
+		pinned: root.niri.overview.isOpen
 	}
 	// }}}
 }

@@ -3,13 +3,14 @@ import QtQuick.Effects
 
 Item {
 	id: btnRoot
-	width: Style.musicPopup.buttonSize
-	height: Style.musicPopup.buttonSize
 
 	required property url iconSource
 	property color color: Style.fgSubtle
 
 	signal clicked()
+
+	width: Style.musicPopup.buttonSize
+	height: Style.musicPopup.buttonSize
 
 	Image {
 		id: rawIcon

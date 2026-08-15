@@ -1,3 +1,5 @@
 module Bars
 LeftBar 1.0 LeftBar.qml
 RightBar 1.0 RightBar.qml
+TopBar 1.0 TopBar.qml
+BottomBar 1.0 BottomBar.qml

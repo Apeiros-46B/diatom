@@ -6,19 +6,15 @@ import Shared
 import "./widgets"
 
 PanelWindow {
-	id: root;
+	id: root
+
+	required property Niri niri
+
 	anchors {
-		right: true;
-		top: true;
-		bottom: true;
+		right: true
+		top: true
+		bottom: true
 	}
-	implicitWidth: Style.bar.width;
-	color: Style.bg;
-
-	required property Niri niri;
-
-	// Workspaces {
-	// 	anchors.top: parent.top
-	// 	niri: root.niri
-	// }
+	implicitWidth: Style.bar.thickness
+	color: Style.bg
 }
