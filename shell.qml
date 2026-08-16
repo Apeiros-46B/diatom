@@ -27,19 +27,16 @@ ShellRoot {
 			id: root
 			property ShellScreen modelData
 
-			TopBar {
-				niri: niriInstance
-				output: root.modelData
-			}
-			BottomBar {
-				niri: niriInstance
-			}
 			LeftBar {
 				niri: niriInstance
 				output: root.modelData.name
 			}
 			RightBar {
 				niri: niriInstance
+			}
+			TopBar {
+				niri: niriInstance
+				output: root.modelData
 			}
 		}
 	}

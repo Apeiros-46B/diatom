@@ -1,3 +1,4 @@
+// niri minimap
 pragma ComponentBehavior: Bound
 
 import QtQuick
@@ -13,8 +14,11 @@ Row {
 	required property Niri niri
 	required property ShellScreen output
 
-	// track active workspace ID for this monitor
 	property var activeWorkspaceId: null
+	property var activeWindowId: null
+	property int activeColumnIndex: -1
+
+	// track active workspace ID
 	SortFilterProxyModel {
 		id: activeWorkspaceProxy
 		model: root.niri.workspaces
@@ -33,7 +37,30 @@ Row {
 		model: activeWorkspaceProxy
 		delegate: QtObject {
 			required property var model
-			Component.onCompleted: root.activeWorkspaceId = model.id
+			property var wsId: model.id
+			property var winId: model.activeWindowId
+			onWsIdChanged: root.activeWorkspaceId = wsId
+			onWinIdChanged: root.activeWindowId = winId
+		}
+	}
+
+	// track active column index, even when in the overview
+	SortFilterProxyModel {
+		id: activeWindowProxy
+		model: root.niri.windows
+		filters: [
+			ValueFilter {
+				roleName: "id"
+				value: root.activeWindowId
+			}
+		]
+	}
+	Instantiator {
+		model: activeWindowProxy
+		delegate: QtObject {
+			required property var model
+			property int colIndex: model.columnIndex
+			onColIndexChanged: root.activeColumnIndex = colIndex
 		}
 	}
 
@@ -74,44 +101,33 @@ Row {
 					? Style.minimap.spacingOuter
 					: Style.minimap.spacingInner
 
-			// technically there is also a wm gap, but i printed the calculations and
-			// omitting the gaps is somehow more accurate
-			property real propoWidth: Style.minimap.width
-				* winDeleg.model.windowWidth / (root.output.width - Style.bar.thickness * 2)
-				* winDeleg.model.windowHeight / (root.output.height - Style.bar.thickness * 2)
+			property real propoWidth: Math.round(Style.minimap.width
+				* winDeleg.model.windowWidth / (root.output.width - Style.bar.thickness * 4)
+				* winDeleg.model.windowHeight / (root.output.height - Style.bar.thickness * 3))
 
 			width: gapSize + propoWidth
 			height: Style.bar.thickness
 
-			Behavior on width { NumberAnimation { duration: 100 } }
+			Behavior on width { NumberAnimation { duration: 75 } }
 
 			Rectangle {
 				id: win
+				property bool isWinFocused: winDeleg.model.id === root.activeWindowId
+				property bool isColumnFocused: winDeleg.model.columnIndex === root.activeColumnIndex
 
 				x: winDeleg.gapSize
 				width: winDeleg.propoWidth
 				height: winDeleg.height
 
-				color: winDeleg.model.isFocused
-					? Style.minimap.focused
-					: isColumnFocused
-						? Style.minimap.focusedCol
-						: Style.minimap.unfocused
-
-				property bool isColumnFocused: {
-					const fw = root.niri.focusedWindow
-					return fw !== null &&
-						fw.workspaceId === winDeleg.model.workspaceId &&
-						fw.columnIndex === winDeleg.model.columnIndex
+				color: {
+					if (winDeleg.model.isUrgent) return Style.minimap.urgent
+					if (isWinFocused) return Style.minimap.focused
+					if (isColumnFocused) return Style.minimap.focusedCol
+					return Style.minimap.unfocused
 				}
 
 				Behavior on color { ColorAnimation { duration: 100 } }
-				Behavior on width { NumberAnimation { duration: 100 } }
-
-				Component.onCompleted: {
-					console.log('a', winDeleg.width)
-					console.log('b', win.width)
-				}
+				Behavior on width { NumberAnimation { duration: 75 } }
 
 				MouseArea {
 					anchors.fill: parent

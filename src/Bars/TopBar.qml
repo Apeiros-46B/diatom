@@ -20,7 +20,7 @@ PanelWindow {
 	color: Style.bg
 
 	Minimap {
-		anchors.centerIn: parent
+		anchors.left: parent.left
 		niri: root.niri
 		output: root.output
 	}

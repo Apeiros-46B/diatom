@@ -30,9 +30,9 @@ QtObject {
 	}
 
 	readonly property var minimap: QtObject {
-		readonly property int spacingOuter: root.lengths.mini
-		readonly property int spacingInner: root.lengths.tiny
-		readonly property int width: root.lengths.huge * 2
+		readonly property int spacingOuter: root.workspace.spacing
+		readonly property int spacingInner: root.workspace.spacing / 2
+		readonly property int width: root.workspace.height * 2
 		readonly property color urgent: Theme.red
 		readonly property color focused: Theme.blue
 		readonly property color focusedCol: Theme.fg3

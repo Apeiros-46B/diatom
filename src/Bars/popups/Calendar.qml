@@ -15,7 +15,7 @@ PopupWindow {
 	anchor {
 		window: bar
 		rect.x: Style.bar.popupGap
-		rect.y: bar.height - height
+		rect.y: bar.height - height - Style.bar.thickness
 	}
 	color: Style.bgPopup
 

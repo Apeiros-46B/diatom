@@ -22,6 +22,7 @@ PanelWindow {
 
 	Workspaces {
 		anchors.top: parent.top
+		anchors.topMargin: Style.bar.thickness
 		niri: root.niri
 		output: root.output
 	}
@@ -73,7 +74,7 @@ PanelWindow {
 		id: calendarPopup
 		bar: root
 		implicitWidth: musicPopup.width
-		implicitHeight: clock.height
+		implicitHeight: clock.height - Style.bar.thickness
 		HoverHandler {
 			onHoveredChanged: root.calendarHovered = hovered
 		}

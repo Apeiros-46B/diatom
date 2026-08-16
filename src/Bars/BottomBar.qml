@@ -3,11 +3,13 @@ import Quickshell
 import Niri
 
 import Shared
+import "./widgets"
 
 PanelWindow {
 	id: root
 
 	required property Niri niri
+	required property ShellScreen output
 
 	anchors {
 		bottom: true
